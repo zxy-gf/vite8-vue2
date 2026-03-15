@@ -1,0 +1,44 @@
+{
+  "name": "vite8-vue2",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "files": [
+    "dist",
+    "index.d.ts"
+  ],
+  "main": "./dist/counter.umd.cjs",
+  "module": "./dist/counter.js",
+  "types": "./index.d.ts",
+  "exports": {
+    "types": "./index.d.ts",
+    "import": "./dist/counter.js",
+    "require": "./dist/counter.umd.cjs"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "vite": "^7.3.1",
+    "vue-template-babel-compiler": "^1.2.0",
+    "vue-template-compiler": "2.5.22",
+    "@vue/component-compiler-utils": "^3.3.0",
+    "hash-sum": "^2.0.0",
+    "slash": "^3.0.0",
+    "querystring": "^0.2.1",
+    "@babel/core": "^7.17.9",
+    "@babel/parser": "^7.17.9",
+    "@vue/babel-preset-jsx": "^1.2.4",
+    "magic-string": "^0.26.1",
+    "debug": "^4.3.4",
+    "@rollup/pluginutils": "^4.2.1",
+    "source-map": "^0.7.3"
+  },
+  "dependencies": {
+    "vue": "2.5.22",
+    "vue-router": "3.0.7",
+    "vuex": "3.1.1",
+    "consolidate": "^0.16.0"
+  }
+}
