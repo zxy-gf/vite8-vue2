@@ -20,25 +20,39 @@
     "build": "vite build"
   },
   "devDependencies": {
-    "vite": "^7.3.1",
-    "vue-template-babel-compiler": "^1.2.0",
-    "vue-template-compiler": "2.5.22",
-    "@vue/component-compiler-utils": "^3.3.0",
-    "hash-sum": "^2.0.0",
-    "slash": "^3.0.0",
-    "querystring": "^0.2.1",
     "@babel/core": "^7.17.9",
     "@babel/parser": "^7.17.9",
-    "@vue/babel-preset-jsx": "^1.2.4",
-    "magic-string": "^0.26.1",
-    "debug": "^4.3.4",
     "@rollup/pluginutils": "^4.2.1",
-    "source-map": "^0.7.3"
+    "@vue/babel-preset-jsx": "^1.2.4",
+    "@vue/component-compiler-utils": "^3.3.0",
+    "debug": "^4.3.4",
+    "hash-sum": "2.0.0",
+    "less": "3.9.0",
+    "magic-string": "^0.26.1",
+    "querystring": "^0.2.1",
+    "sass-embedded": "^1.77.8",
+    "slash": "^3.0.0",
+    "source-map": "^0.7.3",
+    "vite": "8.0.0",
+    "vue-template-babel-compiler": "^1.2.0",
+    "vue-template-compiler": "2.5.22"
   },
   "dependencies": {
+    "@vue/babel-helper-vue-jsx-merge-props": "^1.0.0",
+    "async-validator": "^4.2.5",
+    "axios": "0.18.0",
+    "consolidate": "^0.16.0",
+    "element-ui": "2.4.8",
+    "js-md5": "^0.8.3",
+    "localforage": "1.7.3",
+    "lodash": "^4.17.21",
+    "moment": "2.22.2",
+    "pinyin": "4.0.0",
+    "throttle-debounce": "1.1.0",
+    "vite-plugin-commonjs": "0.10.4",
     "vue": "2.5.22",
     "vue-router": "3.0.7",
-    "vuex": "3.1.1",
-    "consolidate": "^0.16.0"
+    "vuedraggable": "2.23.0",
+    "vuex": "3.1.1"
   }
 }

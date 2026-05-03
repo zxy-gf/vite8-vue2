@@ -1,5 +1,6 @@
 import fs from 'fs'
 import { createFilter } from '@rollup/pluginutils'
+import { parse } from '@babel/parser'
 import { normalizeComponentCode } from './utils/componentNormalizer'
 import { vueHotReloadCode } from './utils/vueHotReload'
 import { parseVueRequest } from './utils/query'
@@ -13,6 +14,57 @@ import { transformVueJsx } from './jsxTransform'
 export const vueComponentNormalizer = '\0/vite/vueComponentNormalizer'
 export const vueHotReload = '\0/vite/vueHotReload'
 
+function hasJsx(code, id) {
+  if (!code.includes('<'))
+    return false
+
+  let ast
+  try {
+    ast = parse(code, {
+      sourceType: 'module',
+      sourceFilename: id,
+      plugins: [
+        'jsx',
+        'typescript',
+        'decorators-legacy',
+        'classProperties',
+        'dynamicImport',
+      ],
+    })
+  }
+  catch {
+    return false
+  }
+
+  const stack = [ast]
+  while (stack.length) {
+    const node = stack.pop()
+    if (!node || typeof node !== 'object')
+      continue
+
+    if (node.type === 'JSXElement' || node.type === 'JSXFragment')
+      return true
+
+    for (const key in node) {
+      const value = node[key]
+      if (!value)
+        continue
+      if (Array.isArray(value)) {
+        for (let i = 0; i < value.length; i++) {
+          const child = value[i]
+          if (child && typeof child === 'object')
+            stack.push(child)
+        }
+      }
+      else if (typeof value === 'object') {
+        stack.push(value)
+      }
+    }
+  }
+
+  return false
+}
+
 export function createVuePlugin(rawOptions = {}) {
   const options = {
     isProduction: process.env.NODE_ENV === 'production',
@@ -21,6 +73,10 @@ export function createVuePlugin(rawOptions = {}) {
   }
 
   const filter = createFilter(options.include || /\.vue$/, options.exclude)
+  const jsxFilter = createFilter(
+    options.jsxInclude || [/\.(jsx|tsx)$/, /jsx/],
+    options.jsxExclude || /node_modules/,
+  )
 
   return {
     name: 'vite-plugin-vue2',
@@ -28,7 +84,8 @@ export function createVuePlugin(rawOptions = {}) {
     config() {
       if (options.jsx) {
         return {
-          esbuild: {
+          oxc: {
+            jsx: 'preserve',
             include: /\.ts$/,
             exclude: /\.(tsx|jsx)$/,
           },
@@ -98,15 +155,25 @@ export function createVuePlugin(rawOptions = {}) {
     async transform(code, id) {
       const { filename, query } = parseVueRequest(id)
 
-      if (/\.(tsx|jsx)$/.test(id) || id.includes('jsx'))
-        return transformVueJsx(code, id, options.jsxOptions)
+      if (options.jsx) {
+        const langJsx = 'lang.jsx' in query || 'lang.tsx' in query
+        const extMatch = /\.(tsx|jsx)$/.test(filename)
+        const includeMatch = jsxFilter(filename)
+        const autoMatch = !query.vue && /\.(ts|js)$/.test(filename) && hasJsx(code, id)
+        if (langJsx || extMatch || includeMatch || autoMatch)
+          return transformVueJsx(code, id, options.jsxOptions)
+      }
 
       if ((!query.vue && !filter(filename)) || query.raw)
         return
 
       if (!query.vue) {
         // main request
-        return await transformMain(code, filename, options, this)
+        const result = await transformMain(code, filename, options, this)
+        if (options.jsx && result?.code && hasJsx(result.code, id))
+          return transformVueJsx(result.code, id, options.jsxOptions)
+
+        return result
       }
 
       const descriptor = getDescriptor(
